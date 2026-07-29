@@ -10,7 +10,7 @@ const BLANK = {
   등기비용율:0.2, 등기비용수동:false, 등기비용수동값:0,
   중개수수료율:0.9, 담보대출비율:70, 보증금:0,
   연면적:0, 리모델링평당단가:0, 신축평당단가:0,
-  공사기간개월:12, 예비비율:20, 공사비대출비율:0,
+  공사기간개월:0, 예비비율:0, 공사비대출비율:0,
   월세관리비:0, 대출금리:4.0, 재매각금액:0, 대지면적:0,
   토지면적:0, 토지면적단위:"평", 공시지가2015:0, 공시지가2025:0,
   pdf섹션임대:true, pdf섹션수익률:true, pdf섹션재매각:true, pdf섹션양도:true, pdf섹션공시지가:true,
@@ -58,8 +58,8 @@ function calc(d) {
     m2,공시2015,공시2025,cagr,상승5:Math.pow(1+cagr,5)-1,상승10:Math.pow(1+cagr,10)-1};
 }
 
-const NI_S = {background:"#0f172a",border:"1px solid #334155",borderRadius:6,color:"#60a5fa",fontSize:13,textAlign:"right",padding:"4px 8px"};
-const PI_S = {background:"#0f172a",border:"1px solid #1e3a5f",borderRadius:6,color:"#93c5fd",fontSize:13,textAlign:"right",padding:"4px 8px"};
+const NI_S = {background:"#f8fafc",border:"1px solid #e2e8f0",borderRadius:6,color:"#1d4ed8",fontSize:13,textAlign:"right",padding:"4px 8px"};
+const PI_S = {background:"#eff6ff",border:"1px solid #bfdbfe",borderRadius:6,color:"#1d4ed8",fontSize:13,textAlign:"right",padding:"4px 8px"};
 
 function IntField({value, onChange, width=98}) {
   const [raw, setRaw] = useState(null);
@@ -97,14 +97,14 @@ function PctField({value, onChange, width=78}) {
 
 const Row=({label,labelW=162,mb=7,children})=>(
   <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:mb}}>
-    {label&&<span style={{width:labelW,fontSize:13,color:"#94a3b8",flexShrink:0}}>{label}</span>}
+    {label&&<span style={{width:labelW,fontSize:13,color:"#64748b",flexShrink:0}}>{label}</span>}
     {children}
   </div>
 );
-const Suf=({c})=><span style={{fontSize:12,color:"#475569"}}>{c}</span>;
-const Pct$=()=><span style={{fontSize:13,color:"#3b82f6",fontWeight:700}}>%</span>;
-const Divider=()=><div style={{borderTop:"1px solid #1e3a5f",margin:"8px 0"}}/>;
-const SubSec=({children,color="#60a5fa"})=><div style={{fontSize:12,fontWeight:700,color,marginBottom:8,marginTop:4}}>{children}</div>;
+const Suf=({c})=><span style={{fontSize:12,color:"#94a3b8"}}>{c}</span>;
+const Pct$=()=><span style={{fontSize:13,color:"#2563eb",fontWeight:700}}>%</span>;
+const Divider=()=><div style={{borderTop:"1px solid #e2e8f0",margin:"8px 0"}}/>;
+const SubSec=({children,color="#1d4ed8"})=><div style={{fontSize:12,fontWeight:700,color,marginBottom:8,marginTop:4}}>{children}</div>;
 
 // ✅ localStorage 기반 저장소 (window.storage 대신)
 const storage = {
@@ -123,7 +123,7 @@ const API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY;
 export default function App() {
   const [list,setList]=useState([]);
   const [cid,setCid]=useState(null);
-  const [d,setD]=useState(DEMO);
+  const [d,setD]=useState(BLANK);
   const [msgs,setMsgs]=useState(INIT_MSGS);
   const [inp,setInp]=useState("");
   const [aiLoad,setAiLoad]=useState(false);
@@ -275,53 +275,53 @@ tr.hl td{background:#f0fdf4;font-weight:700;color:#16a34a}
     showToast("✅ 다운로드 완료 — 파일 열고 Ctrl+P로 PDF 저장");
   },[d,v]);
 
-  const C={card:{background:"#1e293b",borderRadius:12,padding:16,border:"1px solid #334155"}};
-  const Note=({lbl,val,color="#64748b"})=><div style={{fontSize:11,color,marginLeft:170,marginBottom:7}}> ↳ {lbl}: <span style={{color:"#94a3b8",fontFamily:"monospace"}}>{val}</span></div>;
-  const Res=({lbl,val,color,sz=13})=><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}}><span style={{fontSize:13,color:"#94a3b8"}}>{lbl}</span><span style={{fontSize:sz,fontWeight:sz>=14?700:500,color:color||"#e2e8f0",fontFamily:"monospace"}}>{val}</span></div>;
-  const Sec=({children})=><div style={{fontSize:13,fontWeight:700,color:"#60a5fa",marginBottom:12,paddingBottom:7,borderBottom:"1px solid #1e3a5f"}}>{children}</div>;
-  const Stat=({lbl,val,accent,note})=><div style={{background:accent?"linear-gradient(135deg,#1d4ed8,#1e40af)":"#1e293b",border:`1px solid ${accent?"#3b82f6":"#334155"}`,borderRadius:10,padding:"11px 13px",flex:1,minWidth:100}}><div style={{fontSize:11,color:accent?"#93c5fd":"#64748b",marginBottom:2}}>{lbl}</div><div style={{fontSize:14,fontWeight:700,color:accent?"#fff":"#e2e8f0",fontFamily:"monospace"}}>{val}</div>{note&&<div style={{fontSize:10,color:accent?"#bfdbfe":"#475569",marginTop:1}}>{note}</div>}</div>;
-  const PChk=({lbl,k})=><label style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",padding:"7px 10px",background:d[k]?"#0f172a":"transparent",borderRadius:6,border:`1px solid ${d[k]?"#334155":"transparent"}`}}>
-    <input type="checkbox" checked={!!d[k]} onChange={e=>upd(k,e.target.checked)} style={{width:13,height:13,accentColor:"#3b82f6",cursor:"pointer"}}/>
-    <span style={{fontSize:13,color:d[k]?"#e2e8f0":"#64748b"}}>{lbl}</span></label>;
+  const C={card:{background:"#ffffff",borderRadius:12,padding:16,border:"1px solid #e2e8f0",boxShadow:"0 1px 3px rgba(15,23,42,.05)"}};
+  const Note=({lbl,val,color="#64748b"})=><div style={{fontSize:11,color,marginLeft:170,marginBottom:7}}> ↳ {lbl}: <span style={{color:"#475569",fontFamily:"monospace"}}>{val}</span></div>;
+  const Res=({lbl,val,color,sz=13})=><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}}><span style={{fontSize:13,color:"#64748b"}}>{lbl}</span><span style={{fontSize:sz,fontWeight:sz>=14?700:500,color:color||"#1e293b",fontFamily:"monospace"}}>{val}</span></div>;
+  const Sec=({children})=><div style={{fontSize:13,fontWeight:700,color:"#1d4ed8",marginBottom:12,paddingBottom:7,borderBottom:"1px solid #e2e8f0"}}>{children}</div>;
+  const Stat=({lbl,val,accent,note})=><div style={{background:accent?"linear-gradient(135deg,#2563eb,#1d4ed8)":"#ffffff",border:`1px solid ${accent?"#2563eb":"#e2e8f0"}`,borderRadius:10,padding:"11px 13px",flex:1,minWidth:100,boxShadow:accent?"0 2px 8px rgba(37,99,235,.25)":"0 1px 2px rgba(15,23,42,.04)"}}><div style={{fontSize:11,color:accent?"#bfdbfe":"#64748b",marginBottom:2}}>{lbl}</div><div style={{fontSize:14,fontWeight:700,color:accent?"#fff":"#0f172a",fontFamily:"monospace"}}>{val}</div>{note&&<div style={{fontSize:10,color:accent?"#dbeafe":"#94a3b8",marginTop:1}}>{note}</div>}</div>;
+  const PChk=({lbl,k})=><label style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",padding:"7px 10px",background:d[k]?"#eff6ff":"transparent",borderRadius:6,border:`1px solid ${d[k]?"#bfdbfe":"transparent"}`}}>
+    <input type="checkbox" checked={!!d[k]} onChange={e=>upd(k,e.target.checked)} style={{width:13,height:13,accentColor:"#2563eb",cursor:"pointer"}}/>
+    <span style={{fontSize:13,color:d[k]?"#1e293b":"#94a3b8"}}>{lbl}</span></label>;
 
   return (
-    <div style={{height:"100vh",display:"flex",flexDirection:"column",background:"#0f172a",color:"#e2e8f0",fontFamily:"'Pretendard','Noto Sans KR',sans-serif"}}>
-      <div style={{background:"#0a1628",borderBottom:"1px solid #1e3a5f",padding:"10px 14px",display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
+    <div style={{height:"100vh",display:"flex",flexDirection:"column",background:"#f8fafc",color:"#1e293b",fontFamily:"'Pretendard','Noto Sans KR',sans-serif"}}>
+      <div style={{background:"#ffffff",borderBottom:"1px solid #e2e8f0",padding:"10px 14px",display:"flex",alignItems:"center",gap:10,flexShrink:0,boxShadow:"0 1px 2px rgba(15,23,42,.04)"}}>
         <div style={{width:30,height:30,background:"linear-gradient(135deg,#3b82f6,#1d4ed8)",borderRadius:7,display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,flexShrink:0}}>🏢</div>
         <div style={{flex:1}}>
-          <div style={{fontSize:13,fontWeight:700,color:"#f1f5f9"}}>빌딩 자금스케줄 AI 에이전트 <span style={{fontSize:10,color:"#3b82f6",fontWeight:400}}>v1.0</span></div>
-          <div style={{fontSize:10,color:"#475569"}}>상업용 빌딩 투자 분석 · 매물 관리 시스템</div>
+          <div style={{fontSize:13,fontWeight:700,color:"#0f172a"}}>빌딩 자금스케줄 AI 에이전트 <span style={{fontSize:10,color:"#2563eb",fontWeight:400}}>v1.0</span></div>
+          <div style={{fontSize:10,color:"#64748b"}}>상업용 빌딩 투자 분석 · 매물 관리 시스템</div>
         </div>
         <input value={d.propertyName} onChange={e=>upd("propertyName",e.target.value)}
-          style={{background:"#1e293b",border:"1px solid #334155",borderRadius:7,padding:"5px 12px",color:"#f1f5f9",fontSize:13,width:175,textAlign:"center"}}/>
-        <button onClick={save} disabled={saving} style={{padding:"6px 14px",background:saving?"#334155":"linear-gradient(135deg,#059669,#065f46)",border:"none",borderRadius:7,color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",flexShrink:0}}>
+          style={{background:"#f8fafc",border:"1px solid #e2e8f0",borderRadius:7,padding:"5px 12px",color:"#0f172a",fontSize:13,width:175,textAlign:"center"}}/>
+        <button onClick={save} disabled={saving} style={{padding:"6px 14px",background:saving?"#cbd5e1":"linear-gradient(135deg,#059669,#065f46)",border:"none",borderRadius:7,color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",flexShrink:0}}>
           {saving?"저장중…":"💾 저장"}</button>
       </div>
 
       <div style={{flex:1,display:"flex",overflow:"hidden"}}>
-        <div style={{width:sidebar?200:0,minWidth:sidebar?200:0,background:"#0a1120",borderRight:"1px solid #1e293b",display:"flex",flexDirection:"column",transition:"all .2s",overflow:"hidden",flexShrink:0}}>
+        <div style={{width:sidebar?200:0,minWidth:sidebar?200:0,background:"#f8fafc",borderRight:"1px solid #e2e8f0",display:"flex",flexDirection:"column",transition:"all .2s",overflow:"hidden",flexShrink:0}}>
           {sidebar&&<>
-            <div style={{padding:"10px 10px 6px",borderBottom:"1px solid #1e293b",display:"flex",gap:6,flexDirection:"column"}}>
-              <button onClick={()=>setSidebar(false)} style={{background:"none",border:"none",color:"#475569",fontSize:11,cursor:"pointer",textAlign:"left",padding:"0 2px"}}>← 닫기</button>
+            <div style={{padding:"10px 10px 6px",borderBottom:"1px solid #e2e8f0",display:"flex",gap:6,flexDirection:"column"}}>
+              <button onClick={()=>setSidebar(false)} style={{background:"none",border:"none",color:"#94a3b8",fontSize:11,cursor:"pointer",textAlign:"left",padding:"0 2px"}}>← 닫기</button>
               <button onClick={newProp} style={{padding:"7px 0",background:"linear-gradient(135deg,#1d4ed8,#1e40af)",border:"none",borderRadius:7,color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer"}}>+ 새 매물</button>
             </div>
             <div style={{flex:1,overflowY:"auto",padding:"3px 5px"}}>
-              {list.length===0&&<div style={{fontSize:11,color:"#334155",textAlign:"center",padding:"18px 8px",lineHeight:1.7}}>저장된 매물 없음<br/><span style={{color:"#1e3a5f"}}>💾 저장 버튼으로<br/>매물을 저장하세요</span></div>}
+              {list.length===0&&<div style={{fontSize:11,color:"#94a3b8",textAlign:"center",padding:"18px 8px",lineHeight:1.7}}>저장된 매물 없음<br/><span style={{color:"#cbd5e1"}}>💾 저장 버튼으로<br/>매물을 저장하세요</span></div>}
               {list.map(p=>(
-                <div key={p.id} onClick={()=>load(p.id)} style={{padding:"8px 9px",borderRadius:7,marginBottom:3,cursor:"pointer",background:cid===p.id?"#1e3a5f":"transparent",border:`1px solid ${cid===p.id?"#3b82f6":"transparent"}`,position:"relative"}}>
-                  <div style={{fontSize:12,fontWeight:600,color:cid===p.id?"#60a5fa":"#94a3b8",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",paddingRight:20}}>{p.name}</div>
-                  <div style={{fontSize:10,color:"#334155",marginTop:1}}>{p.저장일}</div>
-                  <button onClick={e=>del(p.id,e)} style={{position:"absolute",top:6,right:5,background:"#7f1d1d",border:"1px solid #ef4444",borderRadius:4,color:"#fca5a5",cursor:"pointer",fontSize:11,width:18,height:18,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+                <div key={p.id} onClick={()=>load(p.id)} style={{padding:"8px 9px",borderRadius:7,marginBottom:3,cursor:"pointer",background:cid===p.id?"#eff6ff":"transparent",border:`1px solid ${cid===p.id?"#3b82f6":"transparent"}`,position:"relative"}}>
+                  <div style={{fontSize:12,fontWeight:600,color:cid===p.id?"#1d4ed8":"#64748b",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",paddingRight:20}}>{p.name}</div>
+                  <div style={{fontSize:10,color:"#94a3b8",marginTop:1}}>{p.저장일}</div>
+                  <button onClick={e=>del(p.id,e)} style={{position:"absolute",top:6,right:5,background:"#fee2e2",border:"1px solid #fecaca",borderRadius:4,color:"#dc2626",cursor:"pointer",fontSize:11,width:18,height:18,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
                 </div>))}
             </div>
           </>}
-          {!sidebar&&<button onClick={()=>setSidebar(true)} style={{padding:"14px 0",background:"none",border:"none",color:"#475569",cursor:"pointer",fontSize:11}}>▶ 매물</button>}
+          {!sidebar&&<button onClick={()=>setSidebar(true)} style={{padding:"14px 0",background:"none",border:"none",color:"#94a3b8",cursor:"pointer",fontSize:11}}>▶ 매물</button>}
         </div>
 
         <div style={{flex:1,display:"flex",flexDirection:"column",overflow:"hidden"}}>
-          <div style={{display:"flex",borderBottom:"1px solid #1e293b",flexShrink:0,background:"#0a1628"}}>
+          <div style={{display:"flex",borderBottom:"1px solid #e2e8f0",flexShrink:0,background:"#ffffff"}}>
             {[["schedule","📊 자금스케줄"],["chat","💬 AI 상담"],["pdf","📄 고객 보고서"]].map(([key,lbl])=>(
-              <button key={key} onClick={()=>setTab(key)} style={{padding:"9px 18px",border:"none",background:"transparent",color:tab===key?"#60a5fa":"#475569",borderBottom:tab===key?"2px solid #3b82f6":"2px solid transparent",fontSize:12,fontWeight:tab===key?600:400,cursor:"pointer"}}>{lbl}</button>))}
+              <button key={key} onClick={()=>setTab(key)} style={{padding:"9px 18px",border:"none",background:"transparent",color:tab===key?"#1d4ed8":"#94a3b8",borderBottom:tab===key?"2px solid #3b82f6":"2px solid transparent",fontSize:12,fontWeight:tab===key?600:400,cursor:"pointer"}}>{lbl}</button>))}
           </div>
 
           {tab==="schedule"&&(
@@ -341,22 +341,22 @@ tr.hl td{background:#f0fdf4;font-weight:700;color:#16a34a}
                   <Row label="② 취득세율"><PctField value={d.취득세율} onChange={val=>upd("취득세율",val)}/><Pct$/></Row>
                   <Note lbl="취득세" val={`${fmt2(v.취득세)}만원`}/>
                   <div style={{display:"flex",alignItems:"flex-start",gap:8,marginBottom:7}}>
-                    <span style={{width:162,fontSize:13,color:"#94a3b8",flexShrink:0}}>③ 등기비용</span>
+                    <span style={{width:162,fontSize:13,color:"#64748b",flexShrink:0}}>③ 등기비용</span>
                     <div style={{display:"flex",flexDirection:"column",gap:4}}>
                       <div style={{display:"flex",alignItems:"center",gap:6}}>
                         {d.등기비용수동
                           ? <><IntField value={d.등기비용수동값} onChange={val=>upd("등기비용수동값",val)} width={90}/><Suf c="만원"/></>
-                          : <div style={{width:98,padding:"4px 8px",background:"#0f172a",border:"1px solid #1e293b",borderRadius:6,color:"#64748b",fontSize:13,textAlign:"right"}}>{fmt2(v.등기비용)}</div>
+                          : <div style={{width:98,padding:"4px 8px",background:"#f8fafc",border:"1px solid #e2e8f0",borderRadius:6,color:"#334155",fontSize:13,textAlign:"right"}}>{fmt2(v.등기비용)}</div>
                         }
                         {!d.등기비용수동&&<Suf c="만원"/>}
-                        <button onClick={()=>upd("등기비용수동",!d.등기비용수동)} style={{fontSize:10,padding:"2px 7px",background:d.등기비용수동?"#1e3a5f":"#0f172a",border:"1px solid #334155",borderRadius:5,color:d.등기비용수동?"#60a5fa":"#475569",cursor:"pointer",whiteSpace:"nowrap"}}>
+                        <button onClick={()=>upd("등기비용수동",!d.등기비용수동)} style={{fontSize:10,padding:"2px 7px",background:d.등기비용수동?"#eff6ff":"#f8fafc",border:"1px solid #e2e8f0",borderRadius:5,color:d.등기비용수동?"#1d4ed8":"#94a3b8",cursor:"pointer",whiteSpace:"nowrap"}}>
                           {d.등기비용수동?"직접입력":"자동"}</button>
                       </div>
                       {!d.등기비용수동&&<div style={{display:"flex",alignItems:"center",gap:5}}>
-                        <span style={{fontSize:11,color:"#475569"}}>매매금액 ×</span>
+                        <span style={{fontSize:11,color:"#94a3b8"}}>매매금액 ×</span>
                         <PctField value={d.등기비용율} onChange={val=>upd("등기비용율",val)} width={52}/><Pct$/>
                       </div>}
-                      <span style={{fontSize:10,color:"#475569"}}>채권할인 + 법무사 수수료 포함</span>
+                      <span style={{fontSize:10,color:"#94a3b8"}}>채권할인 + 법무사 수수료 포함</span>
                     </div>
                   </div>
                   <Row label="④ 중개수수료율"><PctField value={d.중개수수료율} onChange={val=>upd("중개수수료율",val)}/><Pct$/></Row>
@@ -364,28 +364,28 @@ tr.hl td{background:#f0fdf4;font-weight:700;color:#16a34a}
                   <Row label="⑤ 담보대출비율"><PctField value={d.담보대출비율} onChange={val=>upd("담보대출비율",val)}/><Pct$/></Row>
                   <Note lbl="담보대출금" val={`${fmt2(v.담보대출)}만원`}/>
                   <Divider/>
-                  <SubSec color="#38bdf8">⑥ 공사비용</SubSec>
+                  <SubSec color="#0284c7">⑥ 공사비용</SubSec>
                   <Row label="연면적" labelW={130}><AreaField value={d.연면적} onChange={val=>upd("연면적",val)} width={80}/><Suf c="평"/></Row>
-                  <Row label="🔨 리모델링" labelW={130}><IntField value={d.리모델링평당단가} onChange={val=>upd("리모델링평당단가",val)} width={80}/><Suf c="만/평 →"/><span style={{fontSize:12,fontWeight:600,color:"#38bdf8",fontFamily:"monospace"}}>{fmt2(v.리모델링공사비)}만</span></Row>
-                  <Row label="🏗️ 신축" labelW={130}><IntField value={d.신축평당단가} onChange={val=>upd("신축평당단가",val)} width={80}/><Suf c="만/평 →"/><span style={{fontSize:12,fontWeight:600,color:"#a78bfa",fontFamily:"monospace"}}>{fmt2(v.신축공사비)}만</span></Row>
-                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:4,paddingLeft:130}}><span style={{fontSize:11,color:"#94a3b8"}}>총 공사비용</span><span style={{fontSize:12,fontWeight:700,color:"#fbbf24",fontFamily:"monospace"}}>{fmt2(v.공사비용)}만원</span></div>
+                  <Row label="🔨 리모델링" labelW={130}><IntField value={d.리모델링평당단가} onChange={val=>upd("리모델링평당단가",val)} width={80}/><Suf c="만/평 →"/><span style={{fontSize:12,fontWeight:600,color:"#0284c7",fontFamily:"monospace"}}>{fmt2(v.리모델링공사비)}만</span></Row>
+                  <Row label="🏗️ 신축" labelW={130}><IntField value={d.신축평당단가} onChange={val=>upd("신축평당단가",val)} width={80}/><Suf c="만/평 →"/><span style={{fontSize:12,fontWeight:600,color:"#7c3aed",fontFamily:"monospace"}}>{fmt2(v.신축공사비)}만</span></Row>
+                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:4,paddingLeft:130}}><span style={{fontSize:11,color:"#64748b"}}>총 공사비용</span><span style={{fontSize:12,fontWeight:700,color:"#d97706",fontFamily:"monospace"}}>{fmt2(v.공사비용)}만원</span></div>
                   <Divider/>
-                  <SubSec color="#fb923c">⑦ 이자+예비비</SubSec>
-                  <div style={{fontSize:11,color:"#64748b",marginBottom:7}}>(담보대출 {fmt2(v.담보대출)}만 + 공사비대출 {fmt2(v.공사비대출)}만) × {d.대출금리}% → 월이자 <strong style={{color:"#fb923c"}}>{fmt2(v.월이자공사)}만원</strong></div>
+                  <SubSec color="#ea580c">⑦ 이자+예비비</SubSec>
+                  <div style={{fontSize:11,color:"#64748b",marginBottom:7}}>(담보대출 {fmt2(v.담보대출)}만 + 공사비대출 {fmt2(v.공사비대출)}만) × {d.대출금리}% → 월이자 <strong style={{color:"#ea580c"}}>{fmt2(v.월이자공사)}만원</strong></div>
                   <Row label="공사기간" labelW={130}><IntField value={d.공사기간개월} onChange={val=>upd("공사기간개월",val)} width={80}/><Suf c="개월"/></Row>
                   <Row label="예비비(공사비용%)" labelW={130}><PctField value={d.예비비율} onChange={val=>upd("예비비율",val)} width={80}/><Pct$/></Row>
-                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:2,paddingLeft:130}}><span style={{fontSize:11,color:"#94a3b8"}}>이자합계</span><span style={{fontSize:11,color:"#fb923c",fontFamily:"monospace"}}>{fmt2(v.이자합계)}만원</span></div>
-                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:2,paddingLeft:130}}><span style={{fontSize:11,color:"#94a3b8"}}>예비비 (공사비용 {fmt2(v.공사비용)}만 × {d.예비비율}%)</span><span style={{fontSize:11,color:"#fb923c",fontFamily:"monospace"}}>{fmt2(v.예비비)}만원</span></div>
-                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:4,paddingLeft:130}}><span style={{fontSize:11,color:"#94a3b8"}}>이자+예비비 합계</span><span style={{fontSize:12,fontWeight:700,color:"#fb923c",fontFamily:"monospace"}}>{fmt2(v.이자예비비)}만원</span></div>
+                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:2,paddingLeft:130}}><span style={{fontSize:11,color:"#64748b"}}>이자합계</span><span style={{fontSize:11,color:"#ea580c",fontFamily:"monospace"}}>{fmt2(v.이자합계)}만원</span></div>
+                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:2,paddingLeft:130}}><span style={{fontSize:11,color:"#64748b"}}>예비비 (공사비용 {fmt2(v.공사비용)}만 × {d.예비비율}%)</span><span style={{fontSize:11,color:"#ea580c",fontFamily:"monospace"}}>{fmt2(v.예비비)}만원</span></div>
+                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:4,paddingLeft:130}}><span style={{fontSize:11,color:"#64748b"}}>이자+예비비 합계</span><span style={{fontSize:12,fontWeight:700,color:"#ea580c",fontFamily:"monospace"}}>{fmt2(v.이자예비비)}만원</span></div>
                   <Divider/>
-                  <SubSec color="#a78bfa">⑧ 공사비 대출</SubSec>
+                  <SubSec color="#7c3aed">⑧ 공사비 대출</SubSec>
                   <Row label="공사비 대출비율" labelW={130}><PctField value={d.공사비대출비율} onChange={val=>upd("공사비대출비율",val)} width={80}/><Pct$/></Row>
-                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:4,paddingLeft:130}}><span style={{fontSize:11,color:"#94a3b8"}}>공사비대출</span><span style={{fontSize:12,fontWeight:700,color:"#a78bfa",fontFamily:"monospace"}}>{fmt2(v.공사비대출)}만원</span></div>
+                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:4,paddingLeft:130}}><span style={{fontSize:11,color:"#64748b"}}>공사비대출</span><span style={{fontSize:12,fontWeight:700,color:"#7c3aed",fontFamily:"monospace"}}>{fmt2(v.공사비대출)}만원</span></div>
                   <Divider/>
                   <Row label="⑨ 보증금"><IntField value={d.보증금} onChange={val=>upd("보증금",val)}/><Suf c="만원"/></Row>
-                  <div style={{borderTop:"1px solid #334155",paddingTop:9,marginTop:5}}>
-                    <Res lbl="⑩ 총 투입금액" val={`${fmt2(v.총투입)}만원`} color="#fbbf24" sz={14}/>
-                    <Res lbl="⑪ 실 투자금액" val={`${fmt2(v.실투자)}만원`} color="#34d399" sz={14}/>
+                  <div style={{borderTop:"1px solid #e2e8f0",paddingTop:9,marginTop:5}}>
+                    <Res lbl="⑩ 총 투입금액" val={`${fmt2(v.총투입)}만원`} color="#d97706" sz={14}/>
+                    <Res lbl="⑪ 실 투자금액" val={`${fmt2(v.실투자)}만원`} color="#059669" sz={14}/>
                   </div>
                 </div>
                 <div style={{display:"flex",flexDirection:"column",gap:12}}>
@@ -394,8 +394,8 @@ tr.hl td{background:#f0fdf4;font-weight:700;color:#16a34a}
                     <Row label="⑫ 월세+관리비"><IntField value={d.월세관리비} onChange={val=>upd("월세관리비",val)}/><Suf c="만원"/></Row>
                     <Row label="대출금리"><PctField value={d.대출금리} onChange={val=>upd("대출금리",val)}/><Pct$/></Row>
                     <Note lbl="월 이자(운영중)" val={`${fmt2(v.월이자운영)}만원`}/>
-                    <div style={{borderTop:"1px solid #334155",paddingTop:7,marginTop:3}}>
-                      <Res lbl="⑭ 월 수익금" val={`${fmt2(v.월수익)}만원`} color={v.월수익>=0?"#34d399":"#f87171"} sz={14}/>
+                    <div style={{borderTop:"1px solid #e2e8f0",paddingTop:7,marginTop:3}}>
+                      <Res lbl="⑭ 월 수익금" val={`${fmt2(v.월수익)}만원`} color={v.월수익>=0?"#059669":"#dc2626"} sz={14}/>
                     </div>
                   </div>
                   <div style={C.card}>
@@ -404,7 +404,7 @@ tr.hl td{background:#f0fdf4;font-weight:700;color:#16a34a}
                     <Res lbl="총 투입금액" val={`${fmt2(v.총투입)}만원`}/>
                     <div style={{display:"flex",justifyContent:"space-between",marginTop:7}}>
                       <span style={{fontSize:13,fontWeight:700}}>수익률</span>
-                      <span style={{fontSize:19,fontWeight:700,color:"#fbbf24",fontFamily:"monospace"}}>{fmtPct(v.수익률원가)}</span>
+                      <span style={{fontSize:19,fontWeight:700,color:"#d97706",fontFamily:"monospace"}}>{fmtPct(v.수익률원가)}</span>
                     </div>
                   </div>
                   <div style={C.card}>
@@ -413,9 +413,9 @@ tr.hl td{background:#f0fdf4;font-weight:700;color:#16a34a}
                     <Row label="대지면적"><AreaField value={d.대지면적} onChange={val=>upd("대지면적",val)}/><Suf c="평"/></Row>
                     <Res lbl="재매각 기준 수익률" val={fmtPct(v.재매각수익률)}/>
                     <Res lbl="대지평단가" val={`${fmt2(v.대지평단가)}만원/평`}/>
-                    <div style={{borderTop:"1px solid #334155",paddingTop:7,marginTop:3}}>
-                      <Res lbl="양도차익"            val={`${fmt2(v.양도차익)}만원`} color="#34d399" sz={14}/>
-                      <Res lbl="실투자금 대비 수익률" val={fmtPct(v.실투자수익률)}   color="#a78bfa" sz={14}/>
+                    <div style={{borderTop:"1px solid #e2e8f0",paddingTop:7,marginTop:3}}>
+                      <Res lbl="양도차익"            val={`${fmt2(v.양도차익)}만원`} color="#059669" sz={14}/>
+                      <Res lbl="실투자금 대비 수익률" val={fmtPct(v.실투자수익률)}   color="#7c3aed" sz={14}/>
                     </div>
                   </div>
                 </div>
@@ -427,11 +427,11 @@ tr.hl td{background:#f0fdf4;font-weight:700;color:#16a34a}
                     <div style={{fontSize:11,color:"#64748b",marginBottom:3}}>토지면적</div>
                     <div style={{display:"flex",gap:4,alignItems:"center"}}>
                       <AreaField value={d.토지면적} onChange={val=>upd("토지면적",val)} width={68}/>
-                      <select value={d.토지면적단위} onChange={e=>upd("토지면적단위",e.target.value)} style={{background:"#0f172a",border:"1px solid #334155",borderRadius:5,color:"#e2e8f0",fontSize:11,padding:"4px 3px"}}>
+                      <select value={d.토지면적단위} onChange={e=>upd("토지면적단위",e.target.value)} style={{background:"#f8fafc",border:"1px solid #e2e8f0",borderRadius:5,color:"#1e293b",fontSize:11,padding:"4px 3px"}}>
                         <option value="평">평</option><option value="㎡">㎡</option>
                       </select>
                     </div>
-                    <div style={{fontSize:10,color:"#475569",marginTop:2}}>{v.m2.toFixed(2)}㎡</div>
+                    <div style={{fontSize:10,color:"#94a3b8",marginTop:2}}>{v.m2.toFixed(2)}㎡</div>
                   </div>
                   {[["2015년 공시지가(원/㎡)","공시지가2015",fmt2(v.공시2015)],["2025년 공시지가(원/㎡)","공시지가2025",fmt2(v.공시2025)]].map(([lbl,k,total])=>(
                     <div key={k}>
@@ -441,18 +441,18 @@ tr.hl td{background:#f0fdf4;font-weight:700;color:#16a34a}
                     </div>))}
                   <div>
                     <div style={{fontSize:11,color:"#64748b",marginBottom:3}}>10년 연평균 상승률</div>
-                    <div style={{padding:"5px 8px",background:"#0f172a",border:"1px solid #475569",borderRadius:6,fontSize:17,fontWeight:700,color:"#34d399"}}>{fmtPct(v.cagr)}</div>
+                    <div style={{padding:"5px 8px",background:"#f0fdf4",border:"1px solid #bbf7d0",borderRadius:6,fontSize:17,fontWeight:700,color:"#059669"}}>{fmtPct(v.cagr)}</div>
                   </div>
                 </div>
                 <div style={{display:"flex",gap:7}}>
                   {[["5년간 누적 상승률",v.상승5,v.공시2025*(1+v.상승5)],["10년간 누적 상승률",v.상승10,v.공시2025*(1+v.상승10)]].map(([lbl,pv,est])=>(
-                    <div key={lbl} style={{flex:1,background:"#0f172a",borderRadius:7,padding:"9px 11px",border:"1px solid #334155"}}>
+                    <div key={lbl} style={{flex:1,background:"#f8fafc",borderRadius:7,padding:"9px 11px",border:"1px solid #e2e8f0"}}>
                       <div style={{fontSize:10,color:"#64748b",marginBottom:1}}>{lbl}</div>
-                      <div style={{fontSize:14,fontWeight:700,color:"#34d399",fontFamily:"monospace"}}>{fmtPct(pv)}</div>
-                      <div style={{fontSize:10,color:"#475569",marginTop:1}}>예상총액: {fmt2(est)}만원</div>
+                      <div style={{fontSize:14,fontWeight:700,color:"#059669",fontFamily:"monospace"}}>{fmtPct(pv)}</div>
+                      <div style={{fontSize:10,color:"#94a3b8",marginTop:1}}>예상총액: {fmt2(est)}만원</div>
                     </div>))}
-                  <div style={{flex:2,background:"#0f172a",borderRadius:7,padding:"9px 11px",border:"1px solid #1e3a5f",fontSize:11,color:"#475569",lineHeight:1.7}}>
-                    <strong style={{color:"#60a5fa"}}>📌 공시지가 조회</strong><br/>
+                  <div style={{flex:2,background:"#eff6ff",borderRadius:7,padding:"9px 11px",border:"1px solid #bfdbfe",fontSize:11,color:"#475569",lineHeight:1.7}}>
+                    <strong style={{color:"#1d4ed8"}}>📌 공시지가 조회</strong><br/>
                     부동산공시가격알리미: realtyprice.kr<br/>국토이용정보체계: eum.go.kr
                   </div>
                 </div>
@@ -460,7 +460,7 @@ tr.hl td{background:#f0fdf4;font-weight:700;color:#16a34a}
               <div style={{...C.card,marginTop:12}}>
                 <Sec>📝 매물 메모</Sec>
                 <textarea value={d.메모} onChange={e=>upd("메모",e.target.value)} placeholder="이 매물에 대한 메모를 남겨두세요..." rows={3}
-                  style={{width:"100%",background:"#0f172a",border:"1px solid #334155",borderRadius:7,color:"#e2e8f0",fontSize:13,padding:"9px 11px",resize:"vertical",outline:"none"}}/>
+                  style={{width:"100%",background:"#f8fafc",border:"1px solid #e2e8f0",borderRadius:7,color:"#1e293b",fontSize:13,padding:"9px 11px",resize:"vertical",outline:"none"}}/>
               </div>
             </div>
           )}
@@ -470,21 +470,21 @@ tr.hl td{background:#f0fdf4;font-weight:700;color:#16a34a}
               <div style={{flex:1,overflow:"auto",padding:14,display:"flex",flexDirection:"column",gap:10}}>
                 {msgs.map((m,i)=>(
                   <div key={i} style={{display:"flex",justifyContent:m.role==="user"?"flex-end":"flex-start"}}>
-                    <div style={{maxWidth:"75%",padding:"10px 14px",background:m.role==="user"?"linear-gradient(135deg,#1d4ed8,#1e40af)":"#1e293b",border:`1px solid ${m.role==="user"?"#3b82f6":"#334155"}`,borderRadius:m.role==="user"?"17px 17px 4px 17px":"17px 17px 17px 4px",fontSize:13,lineHeight:1.6,color:"#e2e8f0",whiteSpace:"pre-wrap"}}>
-                      {m.role==="assistant"&&<div style={{fontSize:10,color:"#60a5fa",marginBottom:3,fontWeight:600}}>🤖 AI 에이전트</div>}
+                    <div style={{maxWidth:"75%",padding:"10px 14px",background:m.role==="user"?"linear-gradient(135deg,#1d4ed8,#1e40af)":"#f1f5f9",border:`1px solid ${m.role==="user"?"#3b82f6":"#e2e8f0"}`,borderRadius:m.role==="user"?"17px 17px 4px 17px":"17px 17px 17px 4px",fontSize:13,lineHeight:1.6,color:m.role==="user"?"#fff":"#1e293b",whiteSpace:"pre-wrap"}}>
+                      {m.role==="assistant"&&<div style={{fontSize:10,color:"#1d4ed8",marginBottom:3,fontWeight:600}}>🤖 AI 에이전트</div>}
                       {m.content}
                     </div>
                   </div>))}
-                {aiLoad&&<div style={{display:"flex"}}><div style={{padding:"10px 14px",background:"#1e293b",border:"1px solid #334155",borderRadius:"17px 17px 17px 4px"}}><div style={{display:"flex",gap:4}}>{[0,1,2].map(j=><div key={j} style={{width:7,height:7,background:"#3b82f6",borderRadius:"50%",animation:"pulse 1s infinite",animationDelay:`${j*0.2}s`}}/>)}</div></div></div>}
+                {aiLoad&&<div style={{display:"flex"}}><div style={{padding:"10px 14px",background:"#f1f5f9",border:"1px solid #e2e8f0",borderRadius:"17px 17px 17px 4px"}}><div style={{display:"flex",gap:4}}>{[0,1,2].map(j=><div key={j} style={{width:7,height:7,background:"#3b82f6",borderRadius:"50%",animation:"pulse 1s infinite",animationDelay:`${j*0.2}s`}}/>)}</div></div></div>}
               </div>
-              <div style={{padding:"10px 14px",borderTop:"1px solid #1e293b",display:"flex",gap:7}}>
+              <div style={{padding:"10px 14px",borderTop:"1px solid #e2e8f0",display:"flex",gap:7}}>
                 <input value={inp} onChange={e=>setInp(e.target.value)} onKeyDown={e=>e.key==="Enter"&&!e.shiftKey&&sendMsg()} placeholder="질문하거나 수치를 요청하세요..."
-                  style={{flex:1,padding:"10px 13px",background:"#1e293b",border:"1px solid #334155",borderRadius:9,color:"#e2e8f0",fontSize:13,outline:"none"}}/>
-                <button onClick={sendMsg} disabled={aiLoad} style={{padding:"10px 16px",background:aiLoad?"#334155":"linear-gradient(135deg,#3b82f6,#1d4ed8)",border:"none",borderRadius:9,color:"#fff",fontSize:13,fontWeight:600,cursor:"pointer"}}>전송</button>
+                  style={{flex:1,padding:"10px 13px",background:"#f8fafc",border:"1px solid #e2e8f0",borderRadius:9,color:"#1e293b",fontSize:13,outline:"none"}}/>
+                <button onClick={sendMsg} disabled={aiLoad} style={{padding:"10px 16px",background:aiLoad?"#cbd5e1":"linear-gradient(135deg,#3b82f6,#1d4ed8)",border:"none",borderRadius:9,color:"#fff",fontSize:13,fontWeight:600,cursor:"pointer"}}>전송</button>
               </div>
               <div style={{padding:"0 14px 10px",display:"flex",gap:5,flexWrap:"wrap"}}>
                 {["이 매물 투자 가치 분석해줘","담보대출 75%로 올리면?","리모델링 vs 신축 어떤 게 유리해?","리스크 요인 알려줘"].map(q=>(
-                  <button key={q} onClick={()=>setInp(q)} style={{padding:"4px 9px",background:"#1e293b",border:"1px solid #334155",borderRadius:18,color:"#94a3b8",fontSize:11,cursor:"pointer"}}>{q}</button>))}
+                  <button key={q} onClick={()=>setInp(q)} style={{padding:"4px 9px",background:"#f1f5f9",border:"1px solid #e2e8f0",borderRadius:18,color:"#64748b",fontSize:11,cursor:"pointer"}}>{q}</button>))}
               </div>
             </div>
           )}
@@ -492,12 +492,12 @@ tr.hl td{background:#f0fdf4;font-weight:700;color:#16a34a}
           {tab==="pdf"&&(
             <div style={{flex:1,overflow:"auto",padding:18}}>
               <div style={{maxWidth:540}}>
-                <div style={{fontSize:14,fontWeight:700,color:"#f1f5f9",marginBottom:3}}>📄 고객용 제안서 생성</div>
+                <div style={{fontSize:14,fontWeight:700,color:"#0f172a",marginBottom:3}}>📄 고객용 제안서 생성</div>
                 <div style={{fontSize:12,color:"#64748b",marginBottom:16}}>포함할 섹션을 선택 후 다운로드하세요.</div>
                 <div style={{...C.card,marginBottom:8,display:"flex",alignItems:"center",gap:9}}>
-                  <div style={{width:16,height:16,background:"#1d4ed8",borderRadius:3,display:"flex",alignItems:"center",justifyContent:"center",fontSize:9,flexShrink:0}}>✓</div>
-                  <span style={{fontSize:13,fontWeight:600,color:"#60a5fa",flex:1}}>✅ 1. 투입금액 내역</span>
-                  <span style={{fontSize:10,color:"#475569",background:"#1e3a5f",padding:"2px 7px",borderRadius:9}}>필수</span>
+                  <div style={{width:16,height:16,background:"#1d4ed8",borderRadius:3,display:"flex",alignItems:"center",justifyContent:"center",fontSize:9,flexShrink:0,color:"#fff"}}>✓</div>
+                  <span style={{fontSize:13,fontWeight:600,color:"#1d4ed8",flex:1}}>✅ 1. 투입금액 내역</span>
+                  <span style={{fontSize:10,color:"#1d4ed8",background:"#eff6ff",padding:"2px 7px",borderRadius:9}}>필수</span>
                 </div>
                 <div style={{...C.card,marginBottom:14}}>
                   <div style={{fontSize:11,color:"#64748b",marginBottom:9}}>선택 섹션</div>
@@ -509,20 +509,20 @@ tr.hl td{background:#f0fdf4;font-weight:700;color:#16a34a}
                     <PChk lbl="공시지가 추이 (2015→2025)" k="pdf섹션공시지가"/>
                   </div>
                 </div>
-                <div style={{...C.card,marginBottom:18,border:"1px solid #1e3a5f"}}>
+                <div style={{...C.card,marginBottom:18,border:"1px solid #bfdbfe"}}>
                   <div style={{fontSize:11,color:"#64748b",marginBottom:8}}>📊 핵심 수치</div>
                   <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4}}>
                     {[["총 투입금액",`${fmt2(v.총투입)}만원`],["실 투자금액",`${fmt2(v.실투자)}만원`],["월 순수익",`${fmt2(v.월수익)}만원`],["수익률",fmtPct(v.수익률원가)],["양도차익",`${fmt2(v.양도차익)}만원`],["실투자금 대비 수익률",fmtPct(v.실투자수익률)],["공시CAGR",fmtPct(v.cagr)],["10년누적",fmtPct(v.상승10)]].map(([k,val])=>(
-                      <div key={k} style={{display:"flex",justifyContent:"space-between",padding:"5px 7px",background:"#0f172a",borderRadius:5}}>
+                      <div key={k} style={{display:"flex",justifyContent:"space-between",padding:"5px 7px",background:"#f8fafc",borderRadius:5}}>
                         <span style={{fontSize:11,color:"#64748b"}}>{k}</span>
-                        <span style={{fontSize:11,fontFamily:"monospace",fontWeight:600,color:"#e2e8f0"}}>{val}</span>
+                        <span style={{fontSize:11,fontFamily:"monospace",fontWeight:600,color:"#1e293b"}}>{val}</span>
                       </div>))}
                   </div>
                 </div>
                 <button onClick={genPDF} style={{width:"100%",padding:"12px 0",background:"linear-gradient(135deg,#1d4ed8,#1e40af)",border:"none",borderRadius:9,color:"#fff",fontSize:14,fontWeight:700,cursor:"pointer"}}>
                   ⬇️ HTML 다운로드 (브라우저에서 PDF 저장)
                 </button>
-                <div style={{fontSize:11,color:"#475569",marginTop:7,textAlign:"center"}}>다운로드 후 브라우저로 열고 Ctrl+P → PDF 저장</div>
+                <div style={{fontSize:11,color:"#94a3b8",marginTop:7,textAlign:"center"}}>다운로드 후 브라우저로 열고 Ctrl+P → PDF 저장</div>
               </div>
             </div>
           )}
@@ -530,7 +530,7 @@ tr.hl td{background:#f0fdf4;font-weight:700;color:#16a34a}
       </div>
 
       {toast&&<div style={{position:"fixed",bottom:20,left:"50%",transform:"translateX(-50%)",background:"#1e293b",border:"1px solid #334155",borderRadius:9,padding:"9px 18px",fontSize:13,color:"#e2e8f0",boxShadow:"0 4px 20px rgba(0,0,0,.5)",zIndex:999,whiteSpace:"nowrap"}}>{toast}</div>}
-      <style>{`@keyframes pulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}input:focus,textarea:focus{outline:none!important;border-color:#3b82f6!important}::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:#0f172a}::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}`}</style>
+      <style>{`@keyframes pulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}input:focus,textarea:focus{outline:none!important;border-color:#3b82f6!important}::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:#f1f5f9}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}`}</style>
     </div>
   );
 }
